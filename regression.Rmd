@@ -1,0 +1,93 @@
+---
+title: "Dharani_HW2_dxn1800002"
+author: "Nalabolu, Dharani"
+date: "4 November 2018"
+output: html_document
+---
+
+Loading the libraries required for the process
+```{r}
+library(ggplot2)
+```
+
+loading the dataset "SystemAdministrators.csv"
+```{r}
+SysAdmin.df <- read.csv("SystemAdministrators.csv")
+```
+
+ANSWER 1
+Plotting the scatter plot of Experience Vs Training to distinguish programmers who completed from those who did not complete
+```{r}
+scatter_plot <- ggplot(data = SysAdmin.df, aes(x = Experience, y = Training, colour = Completed.task)) + geom_point() + labs(title = "completion status of task", x = "Experience in months", y = "Training Credits")
+```
+
+```{r scatter_plot, echo=FALSE}
+plot(scatter_plot)
+```
+
+In the scatter plot obtained we can clearly observe that, at some point after 9 months the programmers were able to complete the tasks assigned. Wheare as in training we can see the credits fall in ranges 4,6 and 8 where we have no enough trend in intrepreting conclusions. 
+Thus, Experience in months is Highly useful for classifying the completion of task
+
+--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------
+ANSWER2
+
+Run logistic Regression to classify data points on basis of completed task
+```{r}
+options(scipen=999)
+
+log.reg <- glm(Completed.task ~ ., data = SysAdmin.df, family = "binomial")
+
+summary(log.reg)
+```
+
+logistic regression equation => log(p/1-p) = -10.9813 + 1.1269*Experience + 0.1805*Training
+
+Now we obtain probabilities for classifying each status of task 
+```{r}
+log.pred <- predict(log.reg, SysAdmin.df[,-3], type = "response")
+log.pred
+```
+
+Next create the confusion matrix to understand the outcome variables
+```{r}
+confu_matrix <- table(Actual = SysAdmin.df$Completed.task, Predicted = ifelse(log.pred>0.5, "YES","NO"))
+```
+
+Misclassifiction on completed tasks
+```{r}
+misclass_completed_task <- confu_matrix[2,1]/(confu_matrix[2,1]+confu_matrix[2,2])
+misclass_completed_task
+```
+There are 15 administrators who actually completed the task. The model predicts that only 10 have completed the task. Which states that the misclassification in terms of completing the task is 33.33%
+ 
+33.33% of programmers are incorrectly classified as failing to complete the task.
+
+
+--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------
+ANSWER 3
+
+log(p/1-p) = B0 + X1*B1 + X2*B2 + ........
+
+log(p/1-p) = -10.9813 + 1.1269*Experience + 0.1805*Training Credits
+ 
+given credits = 6
+probability = 0.6
+
+log(0.6/0.4) = -10.9813 + 1.1269*Experience + 0.1805*6
+
+log(0.6/0.4) = -9.8983 + 1.1269*Experience
+
+Experience = (log(0.6/0.4)+9.8983)/1.1269
+
+Experience = 10.3037/1.1269 => 9.1436
+
+Experience = 9.14 months
+
+9.14 months of experience must be accumulated by a pragrammer with 6 training credits before his or her estimated probability of completing the task exceeds 0.6
+From the above calculations for the probabilty of                   
+--------------------------------------------------------------------------------------------------------
+
+
+R function to determine the exp value
